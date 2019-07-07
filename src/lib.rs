@@ -105,7 +105,7 @@ impl fmt::Display for Storage {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct PcInfo {
     hostname: String,
     kernel_version: String,
