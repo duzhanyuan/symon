@@ -124,8 +124,8 @@ pub struct PcInfo {
 impl PcInfo {
     pub fn new() -> PcInfo {
         PcInfo {
-            hostname: Process::hostname(),
-            kernel_version: Process::kernelv(),
+            hostname: Process::get(SystemProperty::Hostname),
+            kernel_version: Process::get(SystemProperty::OsRelease),
             uptime: Process::uptime(),
             cpu: Process::cpu_info(),
             cpu_clock: Process::cpu_clock(),
@@ -194,20 +194,6 @@ impl Process {
             }
         );
         path
-    }
-
-    fn hostname() -> String {
-        match fs::read_to_string("/proc/sys/kernel/hostname") {
-            Ok(hostname) => String::from(hostname.trim_end()),
-            _ => String::from("null")
-        }
-    }
-
-    fn kernelv() -> String {
-        match fs::read_to_string("/proc/sys/kernel/osrelease") {
-            Ok(kern_v) => String::from(kern_v.trim_end()),
-            _ => String::from("null")
-        }
     }
 
     fn uptime() -> f64 {
@@ -493,26 +479,27 @@ fn conv_b(bytes: u64) -> String {
     }
 }
 
-fn conv_t(sec: f64) -> String {
-    if sec < 60. {
-        format!("{} seconds", sec)
-    }
-    else if 60. <= sec && sec < u64::pow(60, 2) as f64{
-        let minutes = (sec / 60.).floor();
-        let seconds = (sec % 60.).floor();
-        format!("{} minutes {} seconds", minutes, seconds)
-    }
-    else if u64::pow(60, 2) as f64 <= sec && sec < u64::pow(60, 3) as f64{
-        let hours = (sec / u64::pow(60, 2) as f64).floor();
-        let minutes = ((sec % u64::pow(60, 2) as f64) / 60.).floor();
-        let seconds = ((sec % u64::pow(60, 2) as f64) % 60.).floor();
-        format!("{} hours {} minutes {} seconds", hours, minutes, seconds)
-    }
-    else {
-        let days = (sec / (u64::pow(60, 2) as f64 * 24.)).floor();
-        let hours = ((sec % (u64::pow(60, 2) as f64 * 24.)) / u64::pow(60, 2) as f64).floor();
-        let minutes = (((sec % (u64::pow(60, 2) as f64 * 24.)) % u64::pow(60, 2) as f64) / 60.).floor();
-        let seconds = (((sec % (u64::pow(60, 2) as f64 * 24.)) % u64::pow(60, 2) as f64) % 60.).floor();
-        format!("{} days {} hours {} minutes {} seconds", days, hours, minutes, seconds)
-    }
-}
+// unused
+// fn conv_t(sec: f64) -> String {
+//     if sec < 60. {
+//         format!("{} seconds", sec)
+//     }
+//     else if 60. <= sec && sec < u64::pow(60, 2) as f64{
+//         let minutes = (sec / 60.).floor();
+//         let seconds = (sec % 60.).floor();
+//         format!("{} minutes {} seconds", minutes, seconds)
+//     }
+//     else if u64::pow(60, 2) as f64 <= sec && sec < u64::pow(60, 3) as f64{
+//         let hours = (sec / u64::pow(60, 2) as f64).floor();
+//         let minutes = ((sec % u64::pow(60, 2) as f64) / 60.).floor();
+//         let seconds = ((sec % u64::pow(60, 2) as f64) % 60.).floor();
+//         format!("{} hours {} minutes {} seconds", hours, minutes, seconds)
+//     }
+//     else {
+//         let days = (sec / (u64::pow(60, 2) as f64 * 24.)).floor();
+//         let hours = ((sec % (u64::pow(60, 2) as f64 * 24.)) / u64::pow(60, 2) as f64).floor();
+//         let minutes = (((sec % (u64::pow(60, 2) as f64 * 24.)) % u64::pow(60, 2) as f64) / 60.).floor();
+//         let seconds = (((sec % (u64::pow(60, 2) as f64 * 24.)) % u64::pow(60, 2) as f64) % 60.).floor();
+//         format!("{} days {} hours {} minutes {} seconds", days, hours, minutes, seconds)
+//     }
+// }
