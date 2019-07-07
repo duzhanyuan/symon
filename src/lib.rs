@@ -21,8 +21,8 @@ impl NetworkDevice {
 
 impl fmt::Display for NetworkDevice {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f,"│
-│   ├─{}──────────────────────────────────
+        write!(f,"
+│   ├─ {}
 │   │     DOWN:     {}      {}
 │   │     UP:       {}      {}",
             self.name,
@@ -57,12 +57,12 @@ impl Partition {
 
 impl fmt::Display for Partition {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f,"│
-│   ├─{}─────────────────────────────────────
-│   │     MAJ:MIN:     {}:{}
-│   │     SIZE:        {}    {}
-│   │     FILESYSTEM:  {}
-│   │     MOUNTPOINT:  {}", 
+        write!(f,"
+    ├── {}
+    │     MAJ:MIN:     {}:{}
+    │     SIZE:        {}    {}
+    │     FILESYSTEM:  {}
+    │     MOUNTPOINT:  {}", 
             self.name,
             self.major, self.minor,
             conv_b(self.size), self.size,
@@ -93,8 +93,8 @@ impl Storage {
 
 impl fmt::Display for Storage {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f,"│
-│   ├─{}─────────────────────────────────────
+        write!(f,"        
+│   ├─ {}
 │   │     MAJ:MIN:     {}:{}
 │   │     SIZE:        {}    {}",
             self.name,
@@ -158,25 +158,19 @@ impl fmt::Display for PcInfo {
       //      dbg!(part);
         }
         write!(f, 
-        "====================================
-│HOSTNAME:         {}
-│KERNEL VERSION:   {}
-│UPTIME:           {}
-│CPU:              {}
-│CPU CLOCK:        {:.2} MHz
-│MEM:              {}  {}
-│MEMFREE:          {}  {}  {}%
-│SWAP:             {}   {}
-│SWAPFREE:          {}   {}  {}%
-├──────────────────────────────────
-│NETWORK DEVICE ():
-{}
-├──────────────────────────────────
-│STORAGE:
-{}
-├──────────────────────────────────
-│PARTITIONS:
-{}"
+        "┌── SYSTEM INFORMATION ──────
+├ HOSTNAME:         {}
+├ KERNEL VERSION:   {}
+├ UPTIME:           {}
+├ CPU:              {}
+├ CPU CLOCK:        {:.2} MHz
+├ MEM:              {}  {}
+├ MEMFREE:          {}  {}  {}%
+├ SWAP:             {}   {}
+├ SWAPFREE:         {}   {}  {}%
+├ NETWORK DEVICE: {}
+├ STORAGE: {}
+└ PARTITIONS: {}"
         ,   self.hostname, self.kernel_version, self.uptime, self.cpu,
             self.cpu_clock,
             conv_b(self.memory), self.memory,
