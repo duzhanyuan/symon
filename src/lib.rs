@@ -3,6 +3,27 @@ use regex::Regex;
 use std::{ fmt, fs };
 use std::collections::HashMap;
 
+#[derive(Debug, Default)] struct MemInfo { memory: u64, free: u64, swap: u64, swap_free: u64 }
+impl From<String> for MemInfo {
+    fn from(string: String) -> MemInfo {
+        let rgx = vec![
+            Regex::new(r"MemTotal:\s*(\d*)"),
+            Regex::new(r"MemFree:\s*(\d*)"),
+            Regex::new(r"SwapTotal:\s*(\d*)"),
+            Regex::new(r"SwapFree:\s*(\d*)")
+        ];
+        let mut fields = vec![];
+        for i in 0..4 {
+            let data = &rgx[i].clone().unwrap().captures(&string).unwrap();
+            match data[1].parse::<u64>() {
+                Ok(n) =>  fields.push(n * 1024),
+                Err(_e) => fields.push(0)
+            }
+        }
+        MemInfo { memory: fields[0], free: fields[1], swap: fields[2], swap_free: fields[3] }
+    }
+}
+
 #[derive(Debug)]
 struct NetworkDevice {
     name: String,
@@ -105,24 +126,14 @@ impl fmt::Display for Storage {
     }
 }
 
-#[derive(Debug, Default)]
-struct Uptime {
-    first: f64,
-    second: f64
-}
-
+#[derive(Debug, Default)] struct Uptime { first: f64, second: f64 }
 impl From<String> for Uptime {
     fn from(string: String) -> Self {
         let data: Vec<&str> = string.split(' ').collect();
         Uptime { first: data[0].parse().unwrap(), second: 0.0 }
     }
 }
-
-impl Into<String> for Uptime {
-    fn into(self) -> String {
-        utils::conv_t(self.first)
-    }
-}
+impl Into<String> for Uptime { fn into(self) -> String { utils::conv_t(self.first) } }
 
 #[derive(Debug, Default)]
 pub struct PcInfo {
@@ -142,16 +153,17 @@ pub struct PcInfo {
 
 impl PcInfo {
     pub fn new() -> PcInfo {
+        let mem_info = MemInfo::from(Process::get(SystemProperty::MemInfo));
         PcInfo {
             hostname: Process::get(SystemProperty::Hostname),
             kernel_version: Process::get(SystemProperty::OsRelease),
             uptime: Uptime::from(Process::get(SystemProperty::Uptime)).into(),
             cpu: Process::cpu_info(),
             cpu_clock: Process::cpu_clock(),
-            memory: Process::memory_total(),
-            free_memory: Process::memory_free(),
-            swap: Process::swap_total(),
-            free_swap: Process::swap_free(),
+            memory: mem_info.memory,
+            free_memory: mem_info.free,
+            swap: mem_info.swap,
+            free_swap: mem_info.swap_free,
             network_dev: Process::network_dev(),
             storage_dev: Process::storage_dev(),
             partitions: Process::storage_partitions(Process::storage_dev())
@@ -201,86 +213,19 @@ impl fmt::Display for PcInfo {
 }
 
 #[derive(Debug)]
-enum SystemProperty { Hostname, OsRelease, Uptime }
+enum SystemProperty { Hostname, MemInfo, OsRelease, Uptime }
 struct Process;
 impl Process {
     fn get(prop: SystemProperty) -> String {
         let mut path = String::from("/proc/");
         path.push_str( match prop {
+                SystemProperty::MemInfo => "meminfo",
                 SystemProperty::Hostname => "sys/kernel/hostname",
                 SystemProperty::OsRelease => "sys/kernel/osrelease",
                 SystemProperty::Uptime => "uptime"
             }
         );
         fs::read_to_string(path).unwrap()
-    }
-
-    fn memory_total() -> u64 {
-        match fs::read_to_string("/proc/meminfo") {
-            Ok(res) => {
-                let re = Regex::new(r"MemTotal:\s*(\d*)").unwrap();
-                let data = re.captures(&res).unwrap();
-                match data[1].parse::<u64>() {
-                    Ok(n) => n*1024,
-                    Err(e) => {
-                        println!("{}", e);
-                        0
-                    }
-                }
-            },
-            _ => 0
-        }
-    }
-
-    fn memory_free() -> u64 {
-        match fs::read_to_string("/proc/meminfo") {
-            Ok(res) => {
-                let re = Regex::new(r"MemFree:\s*(\d*)").unwrap();
-                let data = re.captures(&res).unwrap();
-                match data[1].parse::<u64>() {
-                    Ok(n) => n*1024,
-                    Err(e) => {
-                        println!("{}", e);
-                        0
-                    }
-                }
-            },
-            _ => 0
-        }
-    }
-
-    fn swap_total() -> u64 {
-        match fs::read_to_string("/proc/meminfo") {
-            Ok(res) => {
-                let re = Regex::new(r"SwapTotal:\s*(\d*)").unwrap();
-                let data = re.captures(&res).unwrap();
-                match data[1].parse::<u64>() {
-                    Ok(n) => n*1024,
-                    Err(e) => {
-                        println!("{}", e);
-                        0
-                    }
-                }
-            },
-            _ => 0
-        }
-    }
-
-    fn swap_free() -> u64 {
-        match fs::read_to_string("/proc/meminfo") {
-            Ok(res) => {
-                let re = Regex::new(r"SwapFree:\s*(\d*)").unwrap();
-                let data = re.captures(&res).unwrap();
-                match data[1].parse::<u64>() {
-                    Ok(n) => n*1024,
-                    Err(e) => {
-                        println!("{}", e);
-                        0
-                    }
-                }
-            },
-            _ => 0
-        }
     }
 
     fn cpu_info() -> String {
