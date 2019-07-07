@@ -104,12 +104,24 @@ impl fmt::Display for Storage {
     }
 }
 
+#[derive(Debug, Default)]
+struct Uptime {
+    first: f64,
+    second: f64
+}
+
+impl From<String> for Uptime {
+    fn from(string: String) -> Self {
+        let data: Vec<&str> = string.split(' ').collect();
+        Uptime { first: data[0].parse().unwrap(), second: 0.0 }
+    }
+}
 
 #[derive(Debug, Default)]
 pub struct PcInfo {
     hostname: String,
     kernel_version: String,
-    uptime: f64,
+    uptime: String,
     cpu: String,
     cpu_clock: f32,
     memory: u64,
@@ -126,7 +138,7 @@ impl PcInfo {
         PcInfo {
             hostname: Process::get(SystemProperty::Hostname),
             kernel_version: Process::get(SystemProperty::OsRelease),
-            uptime: Process::uptime(),
+            uptime: conv_t(Uptime::from(Process::get(SystemProperty::Uptime)).first),
             cpu: Process::cpu_info(),
             cpu_clock: Process::cpu_clock(),
             memory: Process::memory_total(),
@@ -158,10 +170,10 @@ impl fmt::Display for PcInfo {
       //      dbg!(part);
         }
         write!(f, 
-        "┌── SYSTEM INFORMATION ──────
+"┌── SYSTEM INFORMATION ──────
 ├ HOSTNAME:         {}
 ├ KERNEL VERSION:   {}
-├ UPTIME:           {}
+├ UPTIME:           {:#?}
 ├ CPU:              {}
 ├ CPU CLOCK:        {:.2} MHz
 ├ MEM:              {}  {}
@@ -182,34 +194,21 @@ impl fmt::Display for PcInfo {
 }
 
 #[derive(Debug)]
-enum SystemProperty { Hostname, OsRelease }
+enum SystemProperty { Hostname, OsRelease, Uptime }
 struct Process;
 impl Process {
     fn get(prop: SystemProperty) -> String {
-        let mut path = String::from("/proc/sys/kernel/");
+        let mut path = String::from("/proc/");
         path.push_str( match prop {
-                SystemProperty::Hostname => "hostname",
-                SystemProperty::OsRelease => "osrelease",
-               
+                SystemProperty::Hostname => "sys/kernel/hostname",
+                SystemProperty::OsRelease => "sys/kernel/osrelease",
+                SystemProperty::Uptime => "uptime"
             }
         );
-        path
+        fs::read_to_string(path).unwrap()
     }
-
-    fn uptime() -> f64 {
-        match fs::read_to_string("/proc/uptime") {
-            Ok(res) => {
-                let data: Vec<&str> = res.split(' ').collect();
-                match data[0].parse::<f64>() {
-                    Ok(n) => n,
-                    _ => 0.
-                }
-            },
-            _ => 0.
-        }
-    }
-
-    fn memory_total() -> u64{
+    
+    fn memory_total() -> u64 {
         match fs::read_to_string("/proc/meminfo") {
             Ok(res) => {
                 let re = Regex::new(r"MemTotal:\s*(\d*)").unwrap();
@@ -480,26 +479,26 @@ fn conv_b(bytes: u64) -> String {
 }
 
 // unused
-// fn conv_t(sec: f64) -> String {
-//     if sec < 60. {
-//         format!("{} seconds", sec)
-//     }
-//     else if 60. <= sec && sec < u64::pow(60, 2) as f64{
-//         let minutes = (sec / 60.).floor();
-//         let seconds = (sec % 60.).floor();
-//         format!("{} minutes {} seconds", minutes, seconds)
-//     }
-//     else if u64::pow(60, 2) as f64 <= sec && sec < u64::pow(60, 3) as f64{
-//         let hours = (sec / u64::pow(60, 2) as f64).floor();
-//         let minutes = ((sec % u64::pow(60, 2) as f64) / 60.).floor();
-//         let seconds = ((sec % u64::pow(60, 2) as f64) % 60.).floor();
-//         format!("{} hours {} minutes {} seconds", hours, minutes, seconds)
-//     }
-//     else {
-//         let days = (sec / (u64::pow(60, 2) as f64 * 24.)).floor();
-//         let hours = ((sec % (u64::pow(60, 2) as f64 * 24.)) / u64::pow(60, 2) as f64).floor();
-//         let minutes = (((sec % (u64::pow(60, 2) as f64 * 24.)) % u64::pow(60, 2) as f64) / 60.).floor();
-//         let seconds = (((sec % (u64::pow(60, 2) as f64 * 24.)) % u64::pow(60, 2) as f64) % 60.).floor();
-//         format!("{} days {} hours {} minutes {} seconds", days, hours, minutes, seconds)
-//     }
-// }
+fn conv_t(sec: f64) -> String {
+    if sec < 60. {
+        format!("{} seconds", sec)
+    }
+    else if 60. <= sec && sec < u64::pow(60, 2) as f64{
+        let minutes = (sec / 60.).floor();
+        let seconds = (sec % 60.).floor();
+        format!("{} minutes {} seconds", minutes, seconds)
+    }
+    else if u64::pow(60, 2) as f64 <= sec && sec < u64::pow(60, 3) as f64{
+        let hours = (sec / u64::pow(60, 2) as f64).floor();
+        let minutes = ((sec % u64::pow(60, 2) as f64) / 60.).floor();
+        let seconds = ((sec % u64::pow(60, 2) as f64) % 60.).floor();
+        format!("{} hours {} minutes {} seconds", hours, minutes, seconds)
+    }
+    else {
+        let days = (sec / (u64::pow(60, 2) as f64 * 24.)).floor();
+        let hours = ((sec % (u64::pow(60, 2) as f64 * 24.)) / u64::pow(60, 2) as f64).floor();
+        let minutes = (((sec % (u64::pow(60, 2) as f64 * 24.)) % u64::pow(60, 2) as f64) / 60.).floor();
+        let seconds = (((sec % (u64::pow(60, 2) as f64 * 24.)) % u64::pow(60, 2) as f64) % 60.).floor();
+        format!("{} days {} hours {} minutes {} seconds", days, hours, minutes, seconds)
+    }
+}
