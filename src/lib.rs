@@ -1,5 +1,5 @@
 use regex::Regex;
-use std::{fmt, fs, thread, time};
+use std::{ fmt, fs };
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -190,7 +190,7 @@ impl Process {
         path.push_str( match prop {
                 SystemProperty::Hostname => "hostname",
                 SystemProperty::OsRelease => "osrelease",
-                _ => "null"
+               
             }
         );
         path
