@@ -4,23 +4,20 @@ pub fn conv_p(total: u64, free: u64) -> u64 {
 
 pub fn conv_b(bytes: u64) -> String {
     let n: f64 = bytes as f64;
-    if n < 1024. { format!("{} B", n) }
+    let s: (f64, &str) = if n < 1024. { (n, "B") }
     else if 1024. <= n && n < u64::pow(1024, 2) as f64 {
-        let s = n / 1024.;
-        format!("{:.2} KB", s)
+        (n / 1024., "KB")
     }
     else if u64::pow(1024, 2) as f64 <= n && n < u64::pow(1024, 3) as f64 {
-        let s = n / u64::pow(1024, 2) as f64;
-        format!("{:.2} MB", s)
+        (n / u64::pow(1024, 2) as f64, "MB")
     }
     else if u64::pow(1024, 3) as f64 <= n && n < u64::pow(1024, 4) as f64 {
-        let s = n / u64::pow(1024, 3) as f64;
-        format!("{:.2} GB", s)
+        (n / u64::pow(1024, 3) as f64, "GB")
     }
     else {
-        let s = n / u64::pow(1024, 4) as f64;
-        format!("{:.2} TB", s)
-    }
+        (n / u64::pow(1024, 4) as f64, "TB")
+    };
+    format!("{:.2} {}", s.0, s.1)
 }
 
 pub fn conv_t(sec: f64) -> String {
