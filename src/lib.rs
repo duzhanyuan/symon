@@ -3,11 +3,30 @@ use regex::Regex;
 use std::{ fmt, fs };
 use std::collections::HashMap;
 
+#[derive(Debug)] enum SystemProperty { CpuInfo, Hostname, MemInfo, OsRelease, Uptime }
+
 #[derive(Debug, Default)] struct MemInfo { memory: u64, free: u64, swap: u64, swap_free: u64 }
 #[derive(Debug)] struct NetworkDevice { name: String, received_bytes: u64, transfered_bytes: u64 }
 #[derive(Debug)] 
 struct Partition { name: String, major: u8,  minor: u8, size: u64, filesystem: String, mountpoint: String }
+#[derive(Debug, Default)]
+pub struct PcInfo {
+    hostname: String,
+    kernel_version: String,
+    uptime: String,
+    cpu: String,
+    cpu_clock: f32,
+    memory: u64,
+    free_memory: u64,
+    swap: u64,
+    free_swap: u64,
+    network_dev: Vec<NetworkDevice>,
+    storage_dev: Vec<Storage>,
+    partitions: HashMap<String, Vec<Partition>>
+}
+struct Process;
 #[derive(Debug)] struct Storage { name: String, major: u8, minor: u8,  size: u64 }
+#[derive(Debug, Default)] struct Uptime { first: f64, second: f64 }
 
 impl From<String> for MemInfo { 
     fn from(string: String) -> MemInfo {
@@ -82,8 +101,6 @@ impl fmt::Display for Partition {
     }
 }
 
-
-
 impl Storage {
     fn new() -> Storage {
         Storage {
@@ -108,7 +125,6 @@ impl fmt::Display for Storage {
     }
 }
 
-#[derive(Debug, Default)] struct Uptime { first: f64, second: f64 }
 impl From<String> for Uptime {
     fn from(string: String) -> Self {
         let data: Vec<&str> = string.split(' ').collect();
@@ -116,22 +132,6 @@ impl From<String> for Uptime {
     }
 }
 impl Into<String> for Uptime { fn into(self) -> String { utils::conv_t(self.first) } }
-
-#[derive(Debug, Default)]
-pub struct PcInfo {
-    hostname: String,
-    kernel_version: String,
-    uptime: String,
-    cpu: String,
-    cpu_clock: f32,
-    memory: u64,
-    free_memory: u64,
-    swap: u64,
-    free_swap: u64,
-    network_dev: Vec<NetworkDevice>,
-    storage_dev: Vec<Storage>,
-    partitions: HashMap<String, Vec<Partition>>
-}
 
 impl PcInfo {
     pub fn new() -> PcInfo {
@@ -168,7 +168,6 @@ impl fmt::Display for PcInfo {
             for p in parts {
                 partitions.push_str(&p.to_string());
             }
-      //      dbg!(part);
         }
         write!(f, 
 "┌── SYSTEM INFORMATION ──────
@@ -194,13 +193,11 @@ impl fmt::Display for PcInfo {
     }
 }
 
-#[derive(Debug)]
-enum SystemProperty { Hostname, MemInfo, OsRelease, Uptime }
-struct Process;
 impl Process {
     fn get(prop: SystemProperty) -> String {
         let mut path = String::from("/proc/");
         path.push_str( match prop {
+                SystemProperty::CpuInfo => "cpuinfo",
                 SystemProperty::MemInfo => "meminfo",
                 SystemProperty::Hostname => "sys/kernel/hostname",
                 SystemProperty::OsRelease => "sys/kernel/osrelease",
