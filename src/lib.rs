@@ -62,7 +62,7 @@ impl fmt::Display for Partition {
 │   │     MAJ:MIN:     {}:{}
 │   │     SIZE:        {}    {}
 │   │     FILESYSTEM:  {}
-│   │       MOUNTPOINT:  {}", 
+│   │     MOUNTPOINT:  {}", 
             self.name,
             self.major, self.minor,
             conv_b(self.size), self.size,
