@@ -21,7 +21,7 @@ impl NetworkDevice {
 
 impl fmt::Display for NetworkDevice {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f,"
+        write!(f,"│
 │   ├─{}──────────────────────────────────
 │   │     DOWN:     {}      {}
 │   │     UP:       {}      {}",
@@ -57,7 +57,7 @@ impl Partition {
 
 impl fmt::Display for Partition {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f,"
+        write!(f,"│
 │   ├─{}─────────────────────────────────────
 │   │     MAJ:MIN:     {}:{}
 │   │     SIZE:        {}    {}
@@ -93,7 +93,7 @@ impl Storage {
 
 impl fmt::Display for Storage {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f,"
+        write!(f,"│
 │   ├─{}─────────────────────────────────────
 │   │     MAJ:MIN:     {}:{}
 │   │     SIZE:        {}    {}",
