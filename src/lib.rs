@@ -4,7 +4,12 @@ use std::{ fmt, fs };
 use std::collections::HashMap;
 
 #[derive(Debug, Default)] struct MemInfo { memory: u64, free: u64, swap: u64, swap_free: u64 }
-impl From<String> for MemInfo {
+#[derive(Debug)] struct NetworkDevice { name: String, received_bytes: u64, transfered_bytes: u64 }
+#[derive(Debug)] 
+struct Partition { name: String, major: u8,  minor: u8, size: u64, filesystem: String, mountpoint: String }
+#[derive(Debug)] struct Storage { name: String, major: u8, minor: u8,  size: u64 }
+
+impl From<String> for MemInfo { 
     fn from(string: String) -> MemInfo {
         let rgx = vec![
             Regex::new(r"MemTotal:\s*(\d*)"),
@@ -13,8 +18,8 @@ impl From<String> for MemInfo {
             Regex::new(r"SwapFree:\s*(\d*)")
         ];
         let mut fields = vec![];
-        for i in 0..4 {
-            let data = &rgx[i].clone().unwrap().captures(&string).unwrap();
+        for r in rgx.iter().take(4) {
+            let data = r.clone().unwrap().captures(&string).unwrap();
             match data[1].parse::<u64>() {
                 Ok(n) =>  fields.push(n * 1024),
                 Err(_e) => fields.push(0)
@@ -22,13 +27,6 @@ impl From<String> for MemInfo {
         }
         MemInfo { memory: fields[0], free: fields[1], swap: fields[2], swap_free: fields[3] }
     }
-}
-
-#[derive(Debug)]
-struct NetworkDevice {
-    name: String,
-    received_bytes: u64,
-    transfered_bytes: u64,
 }
 
 impl NetworkDevice {
@@ -52,16 +50,6 @@ impl fmt::Display for NetworkDevice {
             utils::conv_b(self.transfered_bytes), self.transfered_bytes
         )
     }
-}
-
-#[derive(Debug)]
-struct Partition {
-    name: String,
-    major: u8,
-    minor: u8,
-    size: u64,
-    filesystem: String,
-    mountpoint: String
 }
 
 impl Partition {
@@ -94,13 +82,7 @@ impl fmt::Display for Partition {
     }
 }
 
-#[derive(Debug)]
-struct Storage {
-    name: String,
-    major: u8,
-    minor: u8,
-    size: u64,
-}
+
 
 impl Storage {
     fn new() -> Storage {
