@@ -1,3 +1,4 @@
+mod utils;
 use regex::Regex;
 use std::{ fmt, fs };
 use std::collections::HashMap;
@@ -26,8 +27,8 @@ impl fmt::Display for NetworkDevice {
 │   │     DOWN:     {}      {}
 │   │     UP:       {}      {}",
             self.name,
-            conv_b(self.received_bytes), self.received_bytes,
-            conv_b(self.transfered_bytes), self.transfered_bytes
+            utils::conv_b(self.received_bytes), self.received_bytes,
+            utils::conv_b(self.transfered_bytes), self.transfered_bytes
         )
     }
 }
@@ -65,7 +66,7 @@ impl fmt::Display for Partition {
     │     MOUNTPOINT:  {}", 
             self.name,
             self.major, self.minor,
-            conv_b(self.size), self.size,
+            utils::conv_b(self.size), self.size,
             self.filesystem,
             self.mountpoint
         )
@@ -99,7 +100,7 @@ impl fmt::Display for Storage {
 │   │     SIZE:        {}    {}",
             self.name,
             self.major, self.minor,
-            conv_b(self.size), self.size
+            utils::conv_b(self.size), self.size
         )
     }
 }
@@ -119,7 +120,7 @@ impl From<String> for Uptime {
 
 impl Into<String> for Uptime {
     fn into(self) -> String {
-        conv_t(self.first)
+        utils::conv_t(self.first)
     }
 }
 
@@ -191,10 +192,10 @@ impl fmt::Display for PcInfo {
 └ PARTITIONS: {}"
         , self.hostname, self.kernel_version, self.uptime, self.cpu,
         self.cpu_clock,
-        conv_b(self.memory), self.memory,
-        conv_b(self.free_memory), self.free_memory, conv_p(self.memory, self.free_memory),
-        conv_b(self.swap), self.swap, 
-        conv_b(self.free_swap), self.free_swap, conv_p(self.swap, self.free_swap),
+        utils::conv_b(self.memory), self.memory,
+        utils::conv_b(self.free_memory), self.free_memory, utils::conv_p(self.memory, self.free_memory),
+        utils::conv_b(self.swap), self.swap, 
+        utils::conv_b(self.free_swap), self.free_swap, utils::conv_p(self.swap, self.free_swap),
         networks, storage, partitions )
     }
 }
@@ -450,61 +451,5 @@ impl Process {
                 devices
             }
         }
-    }
-}
-
-fn conv_p(total: u64, free: u64) -> u64 {
-    if total != 0 {
-        free * 100 / total
-    } else {
-        0
-    }
-}
-
-fn conv_b(bytes: u64) -> String {
-    let n: f64 = bytes as f64;
-    if n < 1024. {
-        format!("{} B", n)
-    }
-    else if 1024. <= n && n < u64::pow(1024, 2) as f64 {
-        let s = n / 1024.;
-        format!("{:.2} KB", s)
-    }
-    else if u64::pow(1024, 2) as f64 <= n && n < u64::pow(1024, 3) as f64 {
-        let s = n / u64::pow(1024, 2) as f64;
-        format!("{:.2} MB", s)
-    }
-    else if u64::pow(1024, 3) as f64 <= n && n < u64::pow(1024, 4) as f64 {
-        let s = n / u64::pow(1024, 3) as f64;
-        format!("{:.2} GB", s)
-    }
-    else {
-        let s = n / u64::pow(1024, 4) as f64;
-        format!("{:.2} TB", s)
-    }
-}
-
-// unused
-fn conv_t(sec: f64) -> String {
-    if sec < 60. {
-        format!("{} seconds", sec)
-    }
-    else if 60. <= sec && sec < u64::pow(60, 2) as f64{
-        let minutes = (sec / 60.).floor();
-        let seconds = (sec % 60.).floor();
-        format!("{} minutes {} seconds", minutes, seconds)
-    }
-    else if u64::pow(60, 2) as f64 <= sec && sec < u64::pow(60, 3) as f64{
-        let hours = (sec / u64::pow(60, 2) as f64).floor();
-        let minutes = ((sec % u64::pow(60, 2) as f64) / 60.).floor();
-        let seconds = ((sec % u64::pow(60, 2) as f64) % 60.).floor();
-        format!("{} hours {} minutes {} seconds", hours, minutes, seconds)
-    }
-    else {
-        let days = (sec / (u64::pow(60, 2) as f64 * 24.)).floor();
-        let hours = ((sec % (u64::pow(60, 2) as f64 * 24.)) / u64::pow(60, 2) as f64).floor();
-        let minutes = (((sec % (u64::pow(60, 2) as f64 * 24.)) % u64::pow(60, 2) as f64) / 60.).floor();
-        let seconds = (((sec % (u64::pow(60, 2) as f64 * 24.)) % u64::pow(60, 2) as f64) % 60.).floor();
-        format!("{} days {} hours {} minutes {} seconds", days, hours, minutes, seconds)
     }
 }
