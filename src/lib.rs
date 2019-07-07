@@ -106,7 +106,7 @@ impl fmt::Display for Storage {
 
 
 #[derive(Debug)]
-struct PcInfo {
+pub struct PcInfo {
     hostname: String,
     kernel_version: String,
     uptime: f64,
@@ -122,7 +122,7 @@ struct PcInfo {
 }
 
 impl PcInfo {
-    fn new() -> PcInfo {
+    pub fn new() -> PcInfo {
         PcInfo {
             hostname: Process::hostname(),
             kernel_version: Process::kernelv(),
@@ -453,14 +453,11 @@ impl Process {
                                     partition.mountpoint = String::from("");
                                     partition.filesystem = String::from("");
                                 }
-                            }
-
-                            
+                            }           
                         }
                     }
                     devices.insert(String::from(dev_name), partitions);
                 }
-                
                 devices
             },
             Err(e) => {
@@ -524,10 +521,4 @@ fn conv_t(sec: f64) -> String {
         let seconds = (((sec % (u64::pow(60, 2) as f64 * 24.)) % u64::pow(60, 2) as f64) % 60.).floor();
         format!("{} days {} hours {} minutes {} seconds", days, hours, minutes, seconds)
     }
-}
-
-fn main() {
-    println!("{}", PcInfo::new().to_string());
-   // dbg!(PcInfo::new());
-   // dbg!(Process::get(SystemProperty::OsRelease));
 }
