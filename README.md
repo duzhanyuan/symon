@@ -2,11 +2,6 @@
 All important information about your system in one place.
 ## Prerequisites
 - Linux (tested on Arch Linux for now only)
-## Installing
-- run  `sudo ./INSTALL`
-- or compile from source with `cargo build --release`
-## Running
-- run `./rustop` in the same directory as the binary file
 ## Example output
     ────────────────────────────────────
     │HOSTNAME:         wojtas-arch
