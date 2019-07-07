@@ -1,16 +1,10 @@
 pub fn conv_p(total: u64, free: u64) -> u64 {
-    if total != 0 {
-        free * 100 / total
-    } else {
-        0
-    }
+    if total != 0 { free * 100 / total } else { 0 }
 }
 
 pub fn conv_b(bytes: u64) -> String {
     let n: f64 = bytes as f64;
-    if n < 1024. {
-        format!("{} B", n)
-    }
+    if n < 1024. { format!("{} B", n) }
     else if 1024. <= n && n < u64::pow(1024, 2) as f64 {
         let s = n / 1024.;
         format!("{:.2} KB", s)
@@ -29,11 +23,8 @@ pub fn conv_b(bytes: u64) -> String {
     }
 }
 
-// unused
 pub fn conv_t(sec: f64) -> String {
-    if sec < 60. {
-        format!("{} seconds", sec)
-    }
+    if sec < 60. { format!("{} seconds", sec) }
     else if 60. <= sec && sec < u64::pow(60, 2) as f64{
         let minutes = (sec / 60.).floor();
         let seconds = (sec % 60.).floor();
