@@ -117,6 +117,12 @@ impl From<String> for Uptime {
     }
 }
 
+impl Into<String> for Uptime {
+    fn into(self) -> String {
+        conv_t(self.first)
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct PcInfo {
     hostname: String,
@@ -138,7 +144,7 @@ impl PcInfo {
         PcInfo {
             hostname: Process::get(SystemProperty::Hostname),
             kernel_version: Process::get(SystemProperty::OsRelease),
-            uptime: conv_t(Uptime::from(Process::get(SystemProperty::Uptime)).first),
+            uptime: Uptime::from(Process::get(SystemProperty::Uptime)).into(),
             cpu: Process::cpu_info(),
             cpu_clock: Process::cpu_clock(),
             memory: Process::memory_total(),
@@ -183,13 +189,13 @@ impl fmt::Display for PcInfo {
 ├ NETWORK DEVICE: {}
 ├ STORAGE: {}
 └ PARTITIONS: {}"
-        ,   self.hostname, self.kernel_version, self.uptime, self.cpu,
-            self.cpu_clock,
-            conv_b(self.memory), self.memory,
-            conv_b(self.free_memory), self.free_memory, conv_p(self.memory, self.free_memory),
-            conv_b(self.swap), self.swap, 
-            conv_b(self.free_swap), self.free_swap, conv_p(self.swap, self.free_swap),
-            networks, storage, partitions )
+        , self.hostname, self.kernel_version, self.uptime, self.cpu,
+        self.cpu_clock,
+        conv_b(self.memory), self.memory,
+        conv_b(self.free_memory), self.free_memory, conv_p(self.memory, self.free_memory),
+        conv_b(self.swap), self.swap, 
+        conv_b(self.free_swap), self.free_swap, conv_p(self.swap, self.free_swap),
+        networks, storage, partitions )
     }
 }
 
@@ -207,7 +213,7 @@ impl Process {
         );
         fs::read_to_string(path).unwrap()
     }
-    
+
     fn memory_total() -> u64 {
         match fs::read_to_string("/proc/meminfo") {
             Ok(res) => {
