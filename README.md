@@ -90,6 +90,17 @@ Summary
 ```
 # Nice to know
 
+
+### Grep
+
+For now, use grep and sed to display a single system property.
+
+```bash
+$ symon | grep uptime --ignore-case | sed 's/├ UPTIME:           //'
+```
+
+### Super Graphics
+
 Neofetch is cool. Try:
 
 ```bash
