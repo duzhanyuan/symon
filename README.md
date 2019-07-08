@@ -1,5 +1,6 @@
 # Rustop
-All important information about your system in one place.
+
+Similar to neofetch, much faster, without the fancy ascii graphics, and written in rust.
 
 This is a fork of [wojciechkepka/rustop](https://github.com/wojciechkepka/rustop)
 
@@ -23,6 +24,7 @@ $ strip target/release/rustop
 
 **Note:** Example output may not display realistic values
 
+```bash
     ┌── SYSTEM INFORMATION ──────
     ├ HOSTNAME:         jflkefl2f
     ├ KERNEL VERSION:   5.1.16-arch1-1-ARCH
@@ -66,3 +68,4 @@ $ strip target/release/rustop
         │     SIZE:        111.54 GB    119764622336
         │     FILESYSTEM:  ext4
         │     MOUNTPOINT:  /
+```
