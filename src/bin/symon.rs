@@ -1,5 +1,5 @@
-extern crate rustop;
-use rustop::PcInfo;
+extern crate symon;
+use symon::PcInfo;
 use std::fmt;
 
 
@@ -40,5 +40,6 @@ fn main() {
         let al = Logo{};
         println!("{}", al.to_string());
     } else {
-        println!("{}", PcInfo::new().to_string()); }
+        println!("{}", PcInfo::new().to_string());
     }
+}

@@ -1,5 +1,5 @@
 [package]
-name = "rustop"
+name = "symon"
 version = "0.1.1"
 authors = ["aspera-non-spernit <g.s.d>"]
 edition = "2018"

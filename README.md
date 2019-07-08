@@ -1,4 +1,4 @@
-# Rustop
+# Symon [saɪmən]
 
 Similar to neofetch, much faster, without the fancy ascii graphics, and written in rust.
 
@@ -13,12 +13,12 @@ This is a fork of [wojciechkepka/rustop](https://github.com/wojciechkepka/rustop
 ## Installation
 
 ```bash
-$ git clone https://github.com/aspera-non-spernit/rustop
-$ cd rustop
+$ git clone https://github.com/aspera-non-spernit/symon
+$ cd symon
 $ cargo build --release
-$ strip target/release/rustop
-# cp target/release/rustop /usr/local/bin
-# chmod 711 /usr/local/bin/rustop
+$ strip target/release/symon
+# cp target/release/symon /usr/local/bin
+# chmod 711 /usr/local/bin/symon
 ```
 ## Example output
 
@@ -75,7 +75,7 @@ $ strip target/release/rustop
 Neofetch is cool. Try:
 
 ```bash
-$ rustop arch
+$ symon arch
 ```
 
 :)

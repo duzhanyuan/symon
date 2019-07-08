@@ -82,7 +82,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rustop"
+name = "symon"
 version = "0.1.1"
 dependencies = [
  "chrono 0.4.7 (registry+https://github.com/rust-lang/crates.io-index)",
