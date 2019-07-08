@@ -1,7 +1,8 @@
+// #![feature(duration_float)] 
+extern crate chrono;
 mod utils;
 use regex::Regex;
-use std::{ fmt, fs };
-use std::collections::HashMap;
+use std::{ collections::HashMap, fmt, fs, time::{ Duration } };
 
 #[derive(Debug)] enum SystemProperty { CpuInfo, Hostname, MemInfo, OsRelease, Uptime }
 
@@ -26,7 +27,9 @@ pub struct PcInfo {
 }
 struct Process;
 #[derive(Debug)] struct Storage { name: String, major: u8, minor: u8,  size: u64 }
-#[derive(Debug, Default)] struct Uptime { first: f64, second: f64 }
+// second currently unused
+#[derive(Debug, Default)] struct Uptime { first: Duration, second: u64 }
+// #[derive(Debug, Default)] struct Uptime { first: u64, second: u64 }
 
 impl From<String> for MemInfo { 
     fn from(string: String) -> MemInfo {
@@ -125,10 +128,14 @@ impl fmt::Display for Storage {
     }
 }
 
+// Duration::from_secs_f64(f64) frequires a Nightly Build
+// This implementation rounds f64 (parsed from StrinG) to u64 causing a possible deviation of uptime
+// of 1 second max.
 impl From<String> for Uptime {
     fn from(string: String) -> Self {
         let data: Vec<&str> = string.split(' ').collect();
-        Uptime { first: data[0].parse().unwrap(), second: 0.0 }
+    //    Uptime { first: Duration::from_secs_f64(data[0].parse().unwrap()), second: 0.0 }
+        Uptime { first: Duration::from_secs(data[0].parse::<f64>().unwrap() as u64), second: 0 }
     }
 }
 impl Into<String> for Uptime { fn into(self) -> String { utils::conv_t(self.first) } }

@@ -20,24 +20,7 @@ pub fn conv_b(bytes: u64) -> String {
     format!("{:.2} {}", s.0, s.1)
 }
 
-pub fn conv_t(sec: f64) -> String {
-    if sec < 60. { format!("{} seconds", sec) }
-    else if 60. <= sec && sec < u64::pow(60, 2) as f64{
-        let minutes = (sec / 60.).floor();
-        let seconds = (sec % 60.).floor();
-        format!("{} minutes {} seconds", minutes, seconds)
-    }
-    else if u64::pow(60, 2) as f64 <= sec && sec < u64::pow(60, 3) as f64{
-        let hours = (sec / u64::pow(60, 2) as f64).floor();
-        let minutes = ((sec % u64::pow(60, 2) as f64) / 60.).floor();
-        let seconds = ((sec % u64::pow(60, 2) as f64) % 60.).floor();
-        format!("{} hours {} minutes {} seconds", hours, minutes, seconds)
-    }
-    else {
-        let days = (sec / (u64::pow(60, 2) as f64 * 24.)).floor();
-        let hours = ((sec % (u64::pow(60, 2) as f64 * 24.)) / u64::pow(60, 2) as f64).floor();
-        let minutes = (((sec % (u64::pow(60, 2) as f64 * 24.)) % u64::pow(60, 2) as f64) / 60.).floor();
-        let seconds = (((sec % (u64::pow(60, 2) as f64 * 24.)) % u64::pow(60, 2) as f64) % 60.).floor();
-        format!("{} days {} hours {} minutes {} seconds", days, hours, minutes, seconds)
-    }
+pub fn conv_t(dur: std::time::Duration) -> String {
+    let d = chrono::Duration::from_std(dur).unwrap();
+    format!("{} days, {} hours {} minutes {} seconds.", d.num_days(), d.num_hours(), d.num_minutes(), d.num_seconds() )
 }
