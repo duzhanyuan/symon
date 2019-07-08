@@ -142,7 +142,6 @@ impl From<String> for Uptime {
 impl fmt::Display for Uptime {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let d = chrono::Duration::from_std(self.first).unwrap();
-        dbg!(d);
         write!(f,"{} days, {} hours {} minutes {} seconds.",
             d.num_days(),
             d.num_hours() - d.num_days() * 24,

@@ -70,6 +70,24 @@ $ strip target/release/symon
         │     MOUNTPOINT:  /
 ```
 
+# Benchmark
+
+So fast.
+
+```bash
+$ hyperfine --warmup 3 "neofetch" "symon"
+Benchmark #1: neofetch
+  Time (mean ± σ):     504.5 ms ±   6.0 ms    [User: 315.6 ms, System: 172.0 ms]
+  Range (min … max):   495.5 ms … 517.0 ms    10 runs
+ 
+Benchmark #2: symon
+  Time (mean ± σ):      25.8 ms ±   0.9 ms    [User: 21.4 ms, System: 4.3 ms]
+  Range (min … max):    23.8 ms …  28.5 ms    93 runs
+ 
+Summary
+  'symon' ran
+   19.56 ± 0.71 times faster than 'neofetch'
+```
 # Nice to know
 
 Neofetch is cool. Try:
