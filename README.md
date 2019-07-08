@@ -69,3 +69,13 @@ $ strip target/release/rustop
         │     FILESYSTEM:  ext4
         │     MOUNTPOINT:  /
 ```
+
+# Nice to know
+
+Neofetch is cool. Try:
+
+```bash
+$ rustop arch
+```
+
+:)
