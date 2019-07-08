@@ -138,7 +138,15 @@ impl From<String> for Uptime {
         Uptime { first: Duration::from_secs(data[0].parse::<f64>().unwrap() as u64), second: 0 }
     }
 }
-impl Into<String> for Uptime { fn into(self) -> String { utils::conv_t(self.first) } }
+
+impl fmt::Display for Uptime {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let d = chrono::Duration::from_std(self.first).unwrap();
+        write!(f,"{} days, {} hours {} minutes {} seconds.",
+            d.num_days(), d.num_hours(), d.num_minutes(), d.num_seconds()
+        )
+    }
+}
 
 impl PcInfo {
     pub fn new() -> PcInfo {
@@ -146,7 +154,7 @@ impl PcInfo {
         PcInfo {
             hostname: Process::get(SystemProperty::Hostname),
             kernel_version: Process::get(SystemProperty::OsRelease),
-            uptime: Uptime::from(Process::get(SystemProperty::Uptime)).into(),
+            uptime: Uptime::from(Process::get(SystemProperty::Uptime)).to_string(),
             cpu: Process::cpu_info(),
             cpu_clock: Process::cpu_clock(),
             memory: mem_info.memory,

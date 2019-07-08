@@ -19,8 +19,3 @@ pub fn conv_b(bytes: u64) -> String {
     };
     format!("{:.2} {}", s.0, s.1)
 }
-
-pub fn conv_t(dur: std::time::Duration) -> String {
-    let d = chrono::Duration::from_std(dur).unwrap();
-    format!("{} days, {} hours {} minutes {} seconds.", d.num_days(), d.num_hours(), d.num_minutes(), d.num_seconds() )
-}
